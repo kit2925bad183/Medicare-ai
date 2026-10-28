@@ -1,0 +1,52 @@
+unit: identity-web
+side_effects:
+  - source_loc: "src/main/java/com/medicare/identity/IdentityService.java:19-37"
+    effect: "For valid registration, trims the submitted email, rejects blank or case-insensitively existing email, stores a lowercase email, BCrypt-encoded password, trimmed names, PATIENT role, supplied timezone, and persists the new User."
+    must_preserve: true
+branches:
+  - source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:38-60"
+    condition: "POST /register arrives without a valid CSRF token."
+    behavior: "Spring Security rejects the request with HTTP 403 before controller registration logic runs."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/identity/IdentityController.java:25-27"
+    condition: "GET /"
+    behavior: "Redirects to /dashboard; no dashboard handler/template was found in the source inventory."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/identity/IdentityController.java:31-35"
+    condition: "The login request includes query parameter error."
+    behavior: "Adds the generic 'Invalid email or password.' message and renders auth/login."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/identity/IdentityController.java:45-48"
+    condition: "Bean Validation reports binding errors on RegistrationRequest."
+    behavior: "Returns auth/register with the bound validation result."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/identity/IdentityController.java:50-53"
+    condition: "IdentityService rejects an invalid or duplicate email."
+    behavior: "Adds the exception message as errorMessage and returns auth/register."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/identity/IdentityController.java:55-57"
+    condition: "Registration completes successfully."
+    behavior: "Redirects to /login."
+    must_preserve: true
+error_paths:
+  - source_loc: "src/main/java/com/medicare/identity/IdentityService.java:22-29"
+    trigger: "Email is absent/blank or already exists case-insensitively."
+    outcome: "Throws IllegalArgumentException; controller renders the registration page with an error message."
+    contract: "POST /register returns the registration view rather than creating an account."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/common/ApiExceptionHandler.java:20-29"
+    trigger: "Controller argument validation raises MethodArgumentNotValidException."
+    outcome: "Adds field error messages to Model and returns the 'error' view."
+    contract: "The referenced error template was not found in the inspected template inventory."
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary:
+    source_loc: "src/main/java/com/medicare/identity/IdentityService.java:18-38"
+    scope: "The duplicate lookup and User save in register() execute within one @Transactional service call."
+    isolation: "Not explicitly configured; provider default applies."
+    must_preserve: true
+notes: >
+  RegistrationRequest requires first/last name, valid email, password length
+  8-128, and a nonblank timezone. Time-zone identifier validity is not checked
+  here. Registration does not send email or perform verification.

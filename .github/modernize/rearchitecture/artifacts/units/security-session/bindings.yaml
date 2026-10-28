@@ -1,0 +1,57 @@
+unit: security-session
+bindings:
+  - type: annotation
+    name: "@Configuration @EnableWebSecurity"
+    source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:15-16"
+    target: "SecurityConfig"
+    must_appear_in_target: true
+    notes: "Declares the Spring Security configuration."
+  - type: filter
+    name: "SecurityFilterChain"
+    source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:38-60"
+    target: "securityFilterChain(HttpSecurity)"
+    must_appear_in_target: true
+    notes: "Configures request authorization, form login, POST logout, remember-me, sessions, and active default CSRF protection."
+  - type: filter
+    name: "Spring Security default CSRF filter"
+    source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:38-60"
+    target: "configured SecurityFilterChain"
+    must_appear_in_target: true
+    notes: "The filter chain does not disable/customize CSRF. Validates unsafe form POSTs; live tests verified missing-token 403 responses."
+  - type: di-registration
+    name: "DaoAuthenticationProvider and PasswordEncoder beans"
+    source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:25-35"
+    target: "CustomUserDetailsService and BCryptPasswordEncoder"
+    must_appear_in_target: true
+    notes: "Database-backed login with BCrypt password verification."
+  - type: convention
+    name: "UserDetailsService"
+    source_loc: "src/main/java/com/medicare/identity/CustomUserDetailsService.java:13-33"
+    target: "CustomUserDetailsService"
+    must_appear_in_target: true
+    notes: "Spring discovers the service as a bean; it maps persisted Role to ROLE_<enum-name>."
+runtime_config:
+  - key: "spring.security.user.name / spring.security.user.password"
+    source_loc: "src/main/resources/application.yml:25-27"
+    source: yaml
+    default_value: "Static application.yml values are present; their effective use with the configured DAO provider is not established by this source analysis."
+    must_appear_in_target: false
+    notes: "The security chain installs a database-backed DaoAuthenticationProvider."
+  - key: "server.servlet.session.cookie.http-only"
+    source_loc: "src/main/resources/application.yml:32-36"
+    source: yaml
+    default_value: "true"
+    must_appear_in_target: true
+    notes: "Session cookie is marked HttpOnly."
+  - key: "server.servlet.session.cookie.secure"
+    source_loc: "src/main/resources/application.yml:32-36"
+    source: yaml
+    default_value: "false"
+    must_appear_in_target: true
+    notes: "Current setting does not require HTTPS-only cookies; deployment behavior requires environment-specific review."
+  - key: "server.servlet.session.cookie.same-site"
+    source_loc: "src/main/resources/application.yml:32-36"
+    source: yaml
+    default_value: LAX
+    must_appear_in_target: true
+    notes: "SameSite policy for the session cookie."

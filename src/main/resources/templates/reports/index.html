@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head><title>Reports &amp; Health Adherence - MediCare AI</title></head>
+<body>
+<section layout:fragment="content">
+    <div class="card hero-card" style="min-height:auto;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+            <div>
+                <span class="eyebrow">Clinical Analytics &amp; Compliance</span>
+                <h3>Adherence &amp; Delivery Reports</h3>
+                <p class="muted">Deterministic analysis of recorded dose actions, notification delivery attempts, and personal health data export.</p>
+            </div>
+            <a class="btn btn-primary" href="/reports/export" download="medicare-health-export.json">&darr; Export My Data (JSON)</a>
+        </div>
+    </div>
+
+    <div class="alert" style="background:#eef7ff;border-color:rgba(29,78,216,0.2);color:var(--navy);font-size:0.9rem;" th:text="${adherence != null ? adherence.disclaimer : ''}">
+        Adherence metrics are calculated exclusively from verified dose action events recorded by the user. A generated occurrence or delivered reminder is not proof that medication was administered.
+    </div>
+
+    <div class="grid grid-2" style="margin-bottom:24px;">
+        <div class="card metric-card">
+            <span class="label">7-Day Dose Adherence</span>
+            <div class="value" style="color:var(--success);" th:text="${adherence != null ? adherence.sevenDayRate + '%' : '100%'}">100%</div>
+            <div class="muted" style="margin-top:6px;font-size:0.85rem;"
+                 th:text="${adherence != null ? adherence.sevenDayTaken + ' of ' + adherence.sevenDayTotal + ' recorded doses taken' : '0 of 0 doses'}">
+                0 of 0 recorded doses taken
+            </div>
+        </div>
+        <div class="card metric-card">
+            <span class="label">30-Day Dose Adherence</span>
+            <div class="value" style="color:var(--primary);" th:text="${adherence != null ? adherence.thirtyDayRate + '%' : '100%'}">100%</div>
+            <div class="muted" style="margin-top:6px;font-size:0.85rem;"
+                 th:text="${adherence != null ? adherence.thirtyDayTaken + ' of ' + adherence.thirtyDayTotal + ' recorded doses taken' : '0 of 0 doses'}">
+                0 of 0 recorded doses taken
+            </div>
+        </div>
+    </div>
+
+    <div class="card panel-section" style="margin-bottom:24px;">
+        <div class="section-heading">
+            <h3 style="margin:0;">Recent Dose Action Log</h3>
+        </div>
+        <div th:if="${doseLogs == null || #lists.isEmpty(doseLogs)}" class="empty-state">
+            <p>No dose actions recorded in the last 30 days. Record doses from your dashboard as reminders come due.</p>
+        </div>
+        <div class="table-wrap" th:if="${doseLogs != null && !#lists.isEmpty(doseLogs)}">
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                <tr style="border-bottom:2px solid var(--border);text-align:left;">
+                    <th style="padding:10px 12px;">Medicine</th>
+                    <th style="padding:10px 12px;">Action Recorded</th>
+                    <th style="padding:10px 12px;">Timestamp</th>
+                    <th style="padding:10px 12px;">Notes</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="log : ${doseLogs}" style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px;" th:text="${log.occurrence != null ? log.occurrence.schedule.medicineName : 'Medicine'}">Medicine</td>
+                    <td style="padding:12px;">
+                        <span class="badge" th:text="${log.action}"
+                              th:style="${log.action == 'TAKEN' ? 'padding:3px 8px;border-radius:6px;background:rgba(22,163,74,0.12);color:var(--success);font-weight:700;font-size:0.8rem;' :
+                                        (log.action == 'SKIPPED' ? 'padding:3px 8px;border-radius:6px;background:rgba(245,158,11,0.12);color:var(--warning);font-weight:700;font-size:0.8rem;' :
+                                        'padding:3px 8px;border-radius:6px;background:rgba(239,68,68,0.12);color:var(--danger);font-weight:700;font-size:0.8rem;')}">TAKEN</span>
+                    </td>
+                    <td style="padding:12px;" th:text="${log.actionTime}">2026-10-28T08:00:00Z</td>
+                    <td style="padding:12px;color:var(--muted);font-size:0.85rem;" th:text="${log.notes != null ? log.notes : '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card panel-section">
+        <div class="section-heading">
+            <h3 style="margin:0;">Notification Delivery Audit History</h3>
+        </div>
+        <div th:if="${deliveries == null || #lists.isEmpty(deliveries)}" class="empty-state">
+            <p>No recent notification delivery records.</p>
+        </div>
+        <div class="table-wrap" th:if="${deliveries != null && !#lists.isEmpty(deliveries)}">
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                <tr style="border-bottom:2px solid var(--border);text-align:left;">
+                    <th style="padding:10px 12px;">Subject</th>
+                    <th style="padding:10px 12px;">Channel</th>
+                    <th style="padding:10px 12px;">Status</th>
+                    <th style="padding:10px 12px;">Attempts</th>
+                    <th style="padding:10px 12px;">Last Error</th>
+                    <th style="padding:10px 12px;">Sent At</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="d : ${deliveries}" style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px;">
+                        <strong th:text="${d.occurrence != null ? d.occurrence.schedule.medicineName : (d.appointment != null ? 'Appointment' : 'Notification')}">Subject</strong>
+                    </td>
+                    <td style="padding:12px;">
+                        <span class="badge" th:text="${d.channel}" style="padding:3px 8px;border-radius:6px;background:var(--primary-soft);color:var(--primary);font-size:0.8rem;font-weight:700;">IN_APP</span>
+                    </td>
+                    <td style="padding:12px;">
+                        <span class="badge" th:text="${d.state}"
+                              th:style="${d.state == 'SENT' || d.state == 'AVAILABLE' ? 'padding:3px 8px;border-radius:6px;background:rgba(22,163,74,0.12);color:var(--success);font-weight:700;font-size:0.8rem;' :
+                                        (d.state == 'RETRYING' ? 'padding:3px 8px;border-radius:6px;background:rgba(245,158,11,0.12);color:var(--warning);font-weight:700;font-size:0.8rem;' :
+                                        'padding:3px 8px;border-radius:6px;background:rgba(239,68,68,0.12);color:var(--danger);font-weight:700;font-size:0.8rem;')}">STATUS</span>
+                    </td>
+                    <td style="padding:12px;" th:text="${d.attemptCount}">0</td>
+                    <td style="padding:12px;color:var(--danger);font-size:0.8rem;" th:text="${d.lastErrorCategory != null ? d.lastErrorCategory : 'None'}">None</td>
+                    <td style="padding:12px;color:var(--muted);font-size:0.85rem;" th:text="${d.sentAt != null ? d.sentAt : d.createdAt}">Timestamp</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>

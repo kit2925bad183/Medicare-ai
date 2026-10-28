@@ -1,0 +1,36 @@
+name: MediCare AI CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build & Test Suite (Java 25)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up OpenJDK 25 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build & Run Automated Tests
+        run: mvn clean test -B
+
+      - name: Package Executable JAR
+        run: mvn package -DskipTests -B
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: medicare-ai-jar
+          path: target/medicare-ai-0.0.1-SNAPSHOT.jar
+          retention-days: 7

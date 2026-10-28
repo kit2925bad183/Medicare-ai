@@ -1,0 +1,68 @@
+contracts:
+  - name: "Home redirect"
+    unit: identity-web
+    type: rest
+    stability: must_preserve
+    source_loc: "src/main/java/com/medicare/identity/IdentityController.java:25-27"
+    contract:
+      method: GET
+      path: /
+      request: "No request body"
+      response: "HTTP redirect to /dashboard"
+      error: "The redirected dashboard route is not present in the inspected production source."
+      auth: "GET / is permitAll; /dashboard is covered by anyRequest().authenticated()."
+    target_contract:
+      method: "GET / -> 302 redirect to /dashboard"
+      notes: "Preserve the current redirect intent while implementing the destination as required by the approved UI scope."
+    semantic_divergence: []
+
+  - name: "Login page and authentication submission"
+    unit: identity-web
+    type: rest
+    stability: must_preserve
+    source_loc: "src/main/java/com/medicare/identity/IdentityController.java:30-36; src/main/resources/templates/auth/login.html:23-32"
+    contract:
+      method: "GET /login; POST /login"
+      path: /login
+      request: "GET accepts optional query parameter error; POST uses Spring Security form fields username and password."
+      response: "GET renders auth/login; invalid credentials redirect to /login?error; successful authentication redirects to /dashboard."
+      error: "Login page renders 'Invalid email or password.' when the error query parameter is present."
+      auth: "GET /login is public; POST is handled by Spring Security and requires a valid CSRF token."
+    target_contract:
+      method: "GET /login -> server-rendered login form; POST /login -> CSRF-protected Spring Security form authentication"
+      notes: "Retain form field names and redirects; preserve the hidden CSRF token rendered in the browser form."
+    semantic_divergence: []
+
+  - name: "Registration form and account creation"
+    unit: identity-web
+    type: rest
+    stability: must_preserve
+    source_loc: "src/main/java/com/medicare/identity/IdentityController.java:38-59; src/main/java/com/medicare/identity/IdentityService.java:18-38"
+    contract:
+      method: "GET /register; POST /register"
+      path: /register
+      request: "POST binds RegistrationRequest fields firstName, lastName, email, password, and timeZone; Bean Validation applies."
+      response: "GET renders auth/register; valid POST creates a patient account and redirects to /login."
+      error: "Field validation errors return the registration view; duplicate/blank email errors are returned in errorMessage."
+      auth: "Both routes are permitAll; account creation is public and the POST requires a valid CSRF token."
+    target_contract:
+      method: "GET /register -> HTML form; POST /register -> CSRF-protected validated account creation"
+      notes: "Preserve validation, normalized email, BCrypt password encoding, patient default role, and success redirect."
+    semantic_divergence: []
+
+  - name: "Logout form submission"
+    unit: security-session
+    type: rest
+    stability: must_preserve
+    source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:47-52; src/main/resources/templates/fragments/layout.html:27"
+    contract:
+      method: POST
+      path: /logout
+      request: "Form POST with a valid Spring Security CSRF token."
+      response: "Redirect to /login?logout."
+      error: "Tokenless logout is rejected with HTTP 403 by the active CSRF filter."
+      auth: "Authenticated session required by the general anyRequest policy; filter invalidates session, clears authentication, and deletes JSESSIONID."
+    target_contract:
+      method: "CSRF-protected POST /logout -> invalidate session, clear authentication, redirect to /login?logout"
+      notes: "Keep POST-only logout and CSRF enforcement; do not exempt logout."
+    semantic_divergence: []

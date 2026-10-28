@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: medicare-ai
+  thymeleaf:
+    cache: false
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./data/medicare;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER_CLASS_NAME:org.h2.Driver}
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+medicare:
+  reminders:
+    poll-delay-ms: ${REMINDER_POLL_DELAY_MS:30000}
+  security:
+    remember-me-key: ${REMEMBER_ME_KEY:local-development-only-change-me}
+
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: ${SESSION_COOKIE_SECURE:false}
+        same-site: LAX
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+logging:
+  level:
+    org.springframework.security: INFO
+    com.medicare: INFO

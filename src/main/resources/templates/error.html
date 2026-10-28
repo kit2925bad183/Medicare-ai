@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MediCare AI | Error</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body class="auth-page">
+<main class="auth-shell">
+    <section class="auth-panel card" role="alert">
+        <p class="eyebrow">Request not completed</p>
+        <h1 th:text="${status} ?: 'Error'">Error</h1>
+        <p th:text="${errorMessage} ?: 'The request could not be completed.'">The request could not be completed.</p>
+        <ul class="field-error-list" th:if="${errors}">
+            <li th:each="entry : ${errors}" th:text="${entry.value}">Invalid value</li>
+        </ul>
+        <a class="btn btn-primary" th:href="@{/dashboard}">Return to dashboard</a>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head><title>Doctor Directory - MediCare AI</title></head>
+<body>
+<section layout:fragment="content">
+    <div class="card hero-card" style="min-height: auto; margin-bottom: 20px;">
+        <div>
+            <span class="eyebrow">Medical Specialists</span>
+            <h3>Healthcare Providers</h3>
+            <p class="muted">Search licensed physicians across specialties and book your consultation slots directly.</p>
+        </div>
+    </div>
+
+    <div class="card panel-section" style="margin-bottom: 20px;">
+        <form method="get" action="/doctors">
+            <div class="form-row">
+                <input type="text" name="specialty" placeholder="Filter by specialty (e.g., Cardiology, General Practice, Neurology)" th:value="${specialty}" style="flex:1;" />
+                <button class="btn btn-primary">Search Specialty</button>
+                <a th:if="${specialty != null && !specialty.isBlank()}" href="/doctors" class="btn btn-ghost">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <div th:if="${doctors == null || #lists.isEmpty(doctors)}" class="card empty-state">
+        <p>No doctors found matching your criteria.</p>
+        <a href="/doctors" class="btn btn-ghost" style="margin-top: 8px;">View All Doctors</a>
+    </div>
+
+    <div class="grid grid-2" th:if="${doctors != null && !#lists.isEmpty(doctors)}">
+        <article class="card panel-section" th:each="doctor : ${doctors}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div>
+                    <h3 style="margin:0 0 6px;" th:text="${doctor.fullName}">Dr. Full Name</h3>
+                    <div style="display:inline-block;padding:3px 8px;border-radius:6px;background:var(--primary-soft);color:var(--primary);font-size:0.85rem;font-weight:700;" th:text="${doctor.specialty}">Specialty</div>
+                </div>
+                <span th:if="${doctor.verified}" class="badge" style="padding:4px 8px;border-radius:6px;background:rgba(22,163,74,0.12);color:var(--success);font-size:0.8rem;font-weight:700;">Verified Provider</span>
+            </div>
+            <div style="margin:16px 0;font-size:0.9rem;color:var(--muted);">
+                <div style="margin-bottom:4px;"><strong style="color:var(--text);" th:text="${doctor.clinicName}">Clinic Name</strong></div>
+                <div th:text="${doctor.clinicAddress}">Clinic Address</div>
+            </div>
+            <a class="btn btn-primary" th:href="@{/appointments/new(doctorId=${doctor.id})}">Book Appointment</a>
+        </article>
+    </div>
+</section>
+</body>
+</html>

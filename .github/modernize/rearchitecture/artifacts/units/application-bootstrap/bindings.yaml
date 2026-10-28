@@ -1,0 +1,45 @@
+unit: application-bootstrap
+bindings:
+  - type: annotation
+    name: "@SpringBootApplication"
+    source_loc: "src/main/java/com/medicare/MediCareAiApplication.java:6"
+    target: "MediCareAiApplication"
+    must_appear_in_target: true
+    notes: "Boot application entry point and component scanning for the com.medicare package."
+  - type: convention
+    name: "Flyway versioned migration discovery"
+    source_loc: "src/main/resources/db/migration/V2__create_users_table.sql:1"
+    target: "Flyway migration runner"
+    must_appear_in_target: true
+    notes: "Flyway discovers and runs the additive V2 migration at startup using the configured baseline-on-migrate policy."
+runtime_config:
+  - key: spring.application.name
+    source_loc: "src/main/resources/application.yml:2"
+    source: yaml
+    default_value: medicare-ai
+    must_appear_in_target: true
+    notes: "Spring application name."
+  - key: server.port
+    source_loc: "src/main/resources/application.yml:29-30"
+    source: yaml
+    default_value: "8080"
+    must_appear_in_target: true
+    notes: "Embedded server listen port."
+  - key: spring.datasource.url
+    source_loc: "src/main/resources/application.yml:5-11"
+    source: env
+    default_value: "jdbc:h2:mem:medicare;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
+    must_appear_in_target: true
+    notes: "DB_URL, DB_USERNAME, DB_PASSWORD, and DB_DRIVER_CLASS_NAME override defaults; the default is in-memory and is not process-restart durable."
+  - key: spring.jpa.hibernate.ddl-auto
+    source_loc: "src/main/resources/application.yml:12-15"
+    source: yaml
+    default_value: validate
+    must_appear_in_target: true
+    notes: "Hibernate validates rather than creates the schema."
+  - key: spring.flyway.enabled / spring.flyway.baseline-on-migrate
+    source_loc: "src/main/resources/application.yml:21-24"
+    source: yaml
+    default_value: "true / true"
+    must_appear_in_target: true
+    notes: "Enables migration execution and baselines an existing schema when needed; current source includes V2."

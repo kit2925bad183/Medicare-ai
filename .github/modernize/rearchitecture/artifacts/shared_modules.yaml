@@ -1,0 +1,62 @@
+modules:
+  - name: user-entity
+    kind: store
+    source_loc: "src/main/java/com/medicare/identity/User.java:11"
+    used_by_units: [identity-web, security-session]
+    fields:
+      - name: id
+        type: java.lang.Long
+      - name: email
+        type: java.lang.String
+      - name: passwordHash
+        type: java.lang.String
+      - name: firstName
+        type: java.lang.String
+      - name: lastName
+        type: java.lang.String
+      - name: role
+        type: com.medicare.identity.Role
+      - name: enabled
+        type: boolean
+      - name: createdAt
+        type: java.time.Instant
+      - name: updatedAt
+        type: java.time.Instant
+      - name: timeZone
+        type: java.lang.String
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "The entity is the shared persistence representation used by registration and database-backed authentication. Preserve current field and enum semantics; Phase 2 storage should be additive."
+
+  - name: user-repository
+    kind: store
+    source_loc: "src/main/java/com/medicare/identity/UserRepository.java:9"
+    used_by_units: [identity-web, security-session]
+    fields:
+      - name: findByEmailIgnoreCase
+        type: "java.util.Optional<com.medicare.identity.User>(java.lang.String)"
+      - name: existsByEmailIgnoreCase
+        type: "boolean(java.lang.String)"
+      - name: save
+        type: "com.medicare.identity.User(com.medicare.identity.User)"
+    god_class: false
+    split_candidate: false
+    migration_strategy: wrap
+    notes: "Spring Data derives email queries and supplies save through JpaRepository; consumers must retain case-insensitive lookup and duplicate detection semantics."
+
+  - name: role-enum
+    kind: dto
+    source_loc: "src/main/java/com/medicare/identity/Role.java:3"
+    used_by_units: [identity-web, security-session]
+    fields:
+      - name: PATIENT
+        type: com.medicare.identity.Role
+      - name: DOCTOR
+        type: com.medicare.identity.Role
+      - name: ADMIN
+        type: com.medicare.identity.Role
+    god_class: false
+    split_candidate: false
+    migration_strategy: copy
+    notes: "Current registration assigns PATIENT; authenticated authorities are generated as ROLE_<enum-name>. No service-level role authorization is present in the current route graph."

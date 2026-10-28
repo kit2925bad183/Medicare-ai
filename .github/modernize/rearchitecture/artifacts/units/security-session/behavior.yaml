@@ -1,0 +1,46 @@
+unit: security-session
+side_effects:
+  - source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:47-52"
+    effect: "POST /logout invalidates the HTTP session, clears authentication, deletes JSESSIONID, then redirects to /login?logout."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:53-55"
+    effect: "Remember-me is enabled with the literal key 'medicare-remember-key' and token validity of 1,209,600 seconds (14 days)."
+    must_preserve: true
+branches:
+  - source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:40-42"
+    condition: "Request matches /, /register, /login, /css/**, /js/**, /images/**, or /error/**."
+    behavior: "Request is permitted without authentication."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:42"
+    condition: "Request does not match an explicitly public path."
+    behavior: "Authentication is required; the current URL policy does not configure role-specific authorization."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:43-46"
+    condition: "Spring Security form authentication succeeds or fails."
+    behavior: "The login page is /login; successful authentication redirects to /dashboard; default failed-login handling returns to /login?error."
+    must_preserve: true
+  - source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:38-60"
+    condition: "A state-changing POST enters the configured filter chain without a valid CSRF token, or with a valid token."
+    behavior: "Default Spring Security CSRF protection rejects tokenless POST /login, /register, and /logout with 403; valid-token requests continue to authentication, registration, or logout handling."
+    must_preserve: true
+    notes: "The current chain does not disable/customize CSRF. t1.1-backend documents live status and redirect checks; CsrfProtectionIntegrationTest covers the corresponding filter behavior."
+  - source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:56-58"
+    condition: "A user starts a second session."
+    behavior: "At most one concurrent session is allowed; the prior session may be expired because maxSessionsPreventsLogin is false."
+    must_preserve: true
+error_paths:
+  - source_loc: "src/main/java/com/medicare/identity/CustomUserDetailsService.java:21-23"
+    trigger: "No user is found for the submitted username/email."
+    outcome: "Throws UsernameNotFoundException."
+    contract: "Spring Security handles failed form authentication; login page presents a generic failure message."
+    must_preserve: true
+concurrency:
+  model: thread-pool
+  tx_boundary: null
+notes: >
+  Authentication is database-backed through CustomUserDetailsService and a
+  DaoAuthenticationProvider using BCrypt. CSRF is active by default and was
+  verified against a booted packaged app in upstream t1.1. The filter-chain
+  policy distinguishes public from authenticated routes but does not enforce
+  PATIENT/DOCTOR/ADMIN authorization. Service-level authorization is not
+  present in current business services.

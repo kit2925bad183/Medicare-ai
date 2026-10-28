@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head><title>Notification Settings - MediCare AI</title></head>
+<body>
+<section layout:fragment="content">
+    <div class="card hero-card" style="min-height:auto;margin-bottom:20px;">
+        <div>
+            <span class="eyebrow">Preferences & Privacy</span>
+            <h3>Reminder & Delivery Settings</h3>
+            <p class="muted">Customize delivery channels, manage quiet hours, and configure your local time zone.</p>
+        </div>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <div class="card form-card">
+        <form method="post" action="/settings/notifications">
+            <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : ''}" th:value="${_csrf != null ? _csrf.token : ''}" />
+
+            <h4 style="margin:0 0 16px;color:var(--navy);">Delivery Channels</h4>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                    <input type="checkbox" name="emailEnabled" th:checked="${preferences != null && preferences.emailEnabled}" style="width:auto;" />
+                    <span><strong>Email Reminders</strong> — Advance notifications for scheduled doses and appointments.</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                    <input type="checkbox" name="browserEnabled" th:checked="${preferences != null && preferences.browserEnabled}" style="width:auto;" />
+                    <span><strong>In-Tab Browser Notifications</strong> — Alerts while using the application dashboard.</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+                    <input type="checkbox" name="pushEnabled" id="pushEnabledCheckbox" th:checked="${preferences != null && preferences.pushEnabled}" style="width:auto;" />
+                    <span><strong>Web Push Notifications</strong> — Receive background reminders via service worker.</span>
+                </label>
+            </div>
+
+            <h4 style="margin:0 0 16px;color:var(--navy);">Quiet Hours</h4>
+            <p class="muted" style="font-size:0.85rem;margin-top:-8px;margin-bottom:14px;">During quiet hours, disruptive delivery alerts are deferred until your active hours resume.</p>
+            <div class="form-row two-up" style="margin-bottom:24px;">
+                <div class="form-group">
+                    <label for="quietStart">Quiet Hours Start</label>
+                    <input type="time" id="quietStart" name="quietStart" th:value="${preferences != null ? preferences.quietStart : ''}" />
+                </div>
+                <div class="form-group">
+                    <label for="quietEnd">Quiet Hours End</label>
+                    <input type="time" id="quietEnd" name="quietEnd" th:value="${preferences != null ? preferences.quietEnd : ''}" />
+                </div>
+            </div>
+
+            <h4 style="margin:0 0 16px;color:var(--navy);">Account Time Zone</h4>
+            <div class="form-group" style="margin-bottom:24px;">
+                <label for="timeZone">IANA Time Zone Identifier</label>
+                <select id="timeZone" name="timeZone" style="max-width:400px;">
+                    <option th:each="zone : ${availableZones}" th:value="${zone}" th:text="${zone}" th:selected="${zone == userTimeZone}"></option>
+                </select>
+            </div>
+
+            <div style="display:flex;gap:12px;">
+                <button class="btn btn-primary">Save Settings</button>
+                <button type="button" id="enablePushBtn" class="btn btn-ghost">Register Push Notification Permission</button>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

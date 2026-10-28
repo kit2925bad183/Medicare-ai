@@ -1,0 +1,90 @@
+units:
+  - name: application-bootstrap
+    trigger: cli
+    trigger_detail: "Java main() starts Spring Boot; context initialization runs Flyway and JPA schema validation before serving requests"
+    source_anchors:
+      - path: src/main/java/com/medicare/MediCareAiApplication.java
+        line: 9
+      - path: src/main/resources/application.yml
+        line: 1
+      - path: src/main/resources/db/migration/V2__create_users_table.sql
+        line: 1
+    exported_signature:
+      - method: "void MediCareAiApplication.main(String[] args)"
+        source_loc: "src/main/java/com/medicare/MediCareAiApplication.java:9"
+        stability: must_preserve
+    dynamic_entrypoints:
+      - target: "com.medicare.* Spring-managed components"
+        mechanism: annotation-scan
+        source_loc: "src/main/java/com/medicare/MediCareAiApplication.java:6"
+      - target: "Flyway migration runner"
+        mechanism: convention
+        source_loc: "src/main/resources/application.yml:21-24"
+    depends_on: []
+    shared_refs: []
+
+  - name: identity-web
+    trigger: route
+    trigger_detail: "GET /, GET /login, GET /register, POST /register (server-rendered Thymeleaf forms)"
+    source_anchors:
+      - path: src/main/java/com/medicare/identity/IdentityController.java
+        line: 16
+      - path: src/main/java/com/medicare/identity/IdentityService.java
+        line: 8
+      - path: src/main/java/com/medicare/identity/RegistrationRequest.java
+        line: 7
+      - path: src/main/java/com/medicare/common/ApiExceptionHandler.java
+        line: 17
+      - path: src/main/resources/templates/auth/login.html
+      - path: src/main/resources/templates/auth/register.html
+    exported_signature:
+      - method: "String IdentityController.index()"
+        source_loc: "src/main/java/com/medicare/identity/IdentityController.java:26"
+        stability: must_preserve
+      - method: "String IdentityController.login(String error, Model model)"
+        source_loc: "src/main/java/com/medicare/identity/IdentityController.java:31"
+        stability: must_preserve
+      - method: "String IdentityController.registerForm(Model model)"
+        source_loc: "src/main/java/com/medicare/identity/IdentityController.java:39"
+        stability: must_preserve
+      - method: "String IdentityController.register(RegistrationRequest request, BindingResult bindingResult, Model model)"
+        source_loc: "src/main/java/com/medicare/identity/IdentityController.java:45"
+        stability: must_preserve
+    dynamic_entrypoints: []
+    depends_on:
+      - unit: security-session
+        via: "POST /login authentication filter and security policy for the login page"
+    shared_refs:
+      - module: user-entity
+        used_fields: [email, passwordHash, firstName, lastName, role, timeZone]
+      - module: user-repository
+        used_fields: [existsByEmailIgnoreCase, save]
+      - module: role-enum
+        used_fields: [PATIENT]
+
+  - name: security-session
+    trigger: route
+    trigger_detail: "Spring Security filter-managed POST /login and POST /logout"
+    source_anchors:
+      - path: src/main/java/com/medicare/config/SecurityConfig.java
+        line: 15
+      - path: src/main/java/com/medicare/identity/CustomUserDetailsService.java
+        line: 13
+    exported_signature:
+      - method: "SecurityFilterChain SecurityConfig.securityFilterChain(HttpSecurity)"
+        source_loc: "src/main/java/com/medicare/config/SecurityConfig.java:38"
+        stability: must_preserve
+    dynamic_entrypoints:
+      - target: "com.medicare.identity.CustomUserDetailsService"
+        mechanism: annotation-scan
+        source_loc: "src/main/java/com/medicare/identity/CustomUserDetailsService.java:13"
+    depends_on:
+      - unit: identity-web
+        via: "Configured loginPage('/login') and registration-created user accounts"
+    shared_refs:
+      - module: user-entity
+        used_fields: [email, passwordHash, role, enabled]
+      - module: user-repository
+        used_fields: [findByEmailIgnoreCase]
+      - module: role-enum
+        used_fields: [PATIENT, DOCTOR, ADMIN]

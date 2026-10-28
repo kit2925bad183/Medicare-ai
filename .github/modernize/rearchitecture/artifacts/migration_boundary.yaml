@@ -1,0 +1,53 @@
+user_intent:
+  raw_request: "Add the Phase 2 feature set to the existing MediCare AI application; preserve CSRF; use additive migrations; continue implementation without a clarification pause."
+  inferred_acceptance:
+    - "Keep the existing single Spring Boot web application and its account/session foundation while adding the requested local-first feature behavior."
+    - "Preserve CSRF protection on state-changing browser requests."
+    - "Add persistent reminder/appointment occurrences and restart-safe delivery behavior without destructive schema changes."
+    - "Enforce caregiver consent and authorization in services, and keep preview/confirmation, audit, privacy, and reporting behavior within the requested feature scope."
+    - "Do not replace unrelated existing identity behavior or introduce paid AI/service dependencies or arbitrary command execution."
+  cleanup_required: false
+strategy: phased
+runtime_reachable:
+  - src/main/java/com/medicare/MediCareAiApplication.java
+  - src/main/java/com/medicare/common/ApiExceptionHandler.java
+  - src/main/java/com/medicare/common/CurrentUserService.java
+  - src/main/java/com/medicare/config/SecurityConfig.java
+  - src/main/java/com/medicare/identity/IdentityController.java
+  - src/main/java/com/medicare/identity/IdentityService.java
+  - src/main/java/com/medicare/identity/RegistrationRequest.java
+  - src/main/java/com/medicare/identity/User.java
+  - src/main/java/com/medicare/identity/UserRepository.java
+  - src/main/java/com/medicare/identity/Role.java
+  - src/main/java/com/medicare/identity/CustomUserDetailsService.java
+  - src/main/resources/application.yml
+  - src/main/resources/db/migration/V2__create_users_table.sql
+  - src/main/resources/static/css/styles.css
+  - src/main/resources/static/js/app.js
+  - src/main/resources/templates/auth/login.html
+  - src/main/resources/templates/auth/register.html
+  - src/main/resources/templates/fragments/layout.html
+must_rewrite: []
+copy_as_is:
+  - path: src/main/java/com/medicare/config/SecurityConfig.java
+    reason: "Source no longer disables or customizes CSRF; upstream live checks verified tokenless POST login/register/logout are rejected and token-bearing requests proceed. Preserve this configuration while adding new routes."
+  - path: src/main/java/com/medicare/identity/IdentityController.java
+    reason: "Existing login/registration route behavior is the baseline; make only scoped extensions supported by approved contracts."
+  - path: src/main/java/com/medicare/identity/IdentityService.java
+    reason: "Preserve account registration semantics and its service transaction."
+  - path: src/main/java/com/medicare/identity/User.java
+    reason: "Preserve existing entity semantics; extend storage additively rather than destructively altering existing account rows."
+legacy_allowed_to_remain:
+  - path: src/main/resources/static/js/app.js
+    reason: "Existing optional Three.js visualization is outside the feature scope unless an approved UI flow explicitly changes it."
+  - path: src/main/resources/templates/fragments/layout.html
+    reason: "The shared navigation shell may be extended as required by UI design; its existing route links do not themselves implement the missing destinations."
+defer_cleanup:
+  - "Do not broadly clean unused navigation links, the optional 3D module, or historical modernization artifacts as part of this feature addition."
+full_rewrite_reason: null
+implementation_rule: >
+  No existing production file is presently identified as a required rewrite target;
+  the CSRF remediation is already present and upstream runtime-verified. Phase 2
+  features require new runtime-reachable units and additive migrations. Keep
+  must_rewrite empty for the current-code boundary, do not infer implementation
+  scope from source_anchors, and preserve the existing CSRF-protected session flow.

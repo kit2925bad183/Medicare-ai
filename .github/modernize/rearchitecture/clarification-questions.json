@@ -1,0 +1,633 @@
+{
+  "schema": "clarification-questions/v1",
+  "generated_at": "2026-10-27T16:33:03.7782345Z",
+  "user_input": "Implement the user's attached Phase 2 brief in the existing MediCare AI project in auto-execution mode. Treat the full scope and requirements as: local-first deterministic assistant that previews and confirms changes; persistent reminder/appointment occurrences and restart-safe scheduler with safe claims/idempotency/retries; email delivery and preferences; browser notification support including in-app and web push if feasible; caregiver approval/revocation with authorization enforced in services; reporting/audit/settings/export; UI updates; security/privacy; comprehensive tests; documentation; migrations additive only. No paid AI service required; no arbitrary command execution; preserve CSRF; do not make unsupported or unverified dependency coordinate/version choices.",
+  "title": "MediCare AI Phase 2 Feature Expansion",
+  "assessment_snapshot": {
+    "intro": "The project profile identifies an in-place Java/Maven upgrade with the following known facts:",
+    "bullets": [
+      "Approximately 370 nonblank Java lines; source and UI framework details have not been inspected.",
+      "The requested Phase 2 scope spans assistant behavior, persistent scheduling, notifications, caregiver authorization, reporting, settings/export, security, tests, and documentation.",
+      "The user requires additive-only migrations, CSRF preservation, no arbitrary command execution, and no unsupported or unverified dependency coordinate/version choices."
+    ]
+  },
+  "proposed_outcome": "Expand the existing MediCare AI application in place while preserving its existing stack and behaviors: implement a local-first deterministic assistant that previews and confirms changes; persist reminder and appointment occurrences with restart-safe scheduling, safe claims, idempotency, and retries; support email preferences and delivery plus in-app and feasible web-push notifications; enforce caregiver approval and revocation in services; add reporting, audit, settings, and export; update the UI; strengthen security and privacy; and deliver comprehensive tests and documentation. Use additive-only database migrations, preserve CSRF, avoid arbitrary command execution and paid AI requirements, and verify any dependency coordinates or versions before use.",
+  "scope": [
+    "frontend",
+    "backend",
+    "generic"
+  ],
+  "status": "answered",
+  "questions": [
+    {
+      "id": "F1",
+      "kit": "frontend",
+      "field": "target.framework",
+      "title": "Frontend framework",
+      "question": "Which frontend framework and version should Phase 2 use? Should it preserve the existing framework (to be identified during analysis), or do you want a specific target?",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "Preserve the existing frontend framework and version; identify it during analysis",
+      "default": null,
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "React 18",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Preserve the existing frontend framework and version; identify it during analysis",
+          "label": "Preserve existing framework (Recommended)"
+        },
+        {
+          "value": "React 18",
+          "label": "React 18"
+        },
+        {
+          "value": "Vue 3",
+          "label": "Vue 3"
+        },
+        {
+          "value": "Angular 17",
+          "label": "Angular 17"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F2",
+      "kit": "frontend",
+      "field": "target.component_library",
+      "title": "UI component library",
+      "question": "Which component/UI library should Phase 2 use? Is preserving the existing components and avoiding a new UI dependency preferred?",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "Preserve existing UI components and libraries; introduce no new component-library dependency",
+      "default": null,
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "Tailwind CSS",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Preserve existing UI components and libraries; introduce no new component-library dependency",
+          "label": "Preserve existing UI components (Recommended)"
+        },
+        {
+          "value": "Material UI",
+          "label": "Material UI"
+        },
+        {
+          "value": "Bootstrap",
+          "label": "Bootstrap"
+        },
+        {
+          "value": "Tailwind CSS",
+          "label": "Tailwind CSS"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F3",
+      "kit": "frontend",
+      "field": "visual.screenshots",
+      "title": "Current UI references",
+      "question": "Please provide screenshots, screen recordings, or a staging URL for the existing screens that Phase 2 will update. If none are available, say so and identify any key screens or states to preserve.",
+      "importance": "required",
+      "impact": 5,
+      "recommended": null,
+      "default": null,
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": null,
+        "source": "skipped"
+      },
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "F4",
+      "kit": "frontend",
+      "field": "visual.design_system",
+      "title": "Design system",
+      "question": "What design system, brand tokens, or visual reference should guide the UI updates? You may provide a Figma/Storybook URL or token-file path, or confirm that the current application styling should be preserved.",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "Preserve the existing application styling and derive tokens from the current UI",
+      "default": "match existing pixel-by-pixel using extracted CSS custom properties",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "match existing pixel-by-pixel using extracted CSS custom properties",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Preserve the existing application styling and derive tokens from the current UI",
+          "label": "Preserve existing styling (Recommended)"
+        },
+        {
+          "value": "Match existing UI pixel-by-pixel using extracted CSS custom properties",
+          "label": "Match current UI pixel-by-pixel"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F5",
+      "kit": "frontend",
+      "field": "compliance.accessibility",
+      "title": "Accessibility target",
+      "question": "Which accessibility standard should the updated UI target?",
+      "importance": "recommended",
+      "impact": 3,
+      "recommended": "WCAG 2.1 AA",
+      "default": "WCAG 2.1 AA",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "WCAG 2.1 AA",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "WCAG 2.1 AA",
+          "label": "WCAG 2.1 AA (Recommended)"
+        },
+        {
+          "value": "WCAG 2.2 AA",
+          "label": "WCAG 2.2 AA"
+        },
+        {
+          "value": "Section 508",
+          "label": "Section 508"
+        },
+        {
+          "value": "None / not required",
+          "label": "None / not required"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F6",
+      "kit": "frontend",
+      "field": "compatibility.browsers",
+      "title": "Browser support",
+      "question": "Which browsers and versions must support the updated application?",
+      "importance": "recommended",
+      "impact": 3,
+      "recommended": "Modern evergreen browsers (Chrome, Firefox, Safari, Edge — latest 2 major versions)",
+      "default": "modern evergreen (Chrome, Firefox, Safari, Edge — latest 2 major versions)",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "modern evergreen (Chrome, Firefox, Safari, Edge — latest 2 major versions)",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Modern evergreen browsers (Chrome, Firefox, Safari, Edge — latest 2 major versions)",
+          "label": "Modern evergreen, latest 2 versions (Recommended)"
+        },
+        {
+          "value": "Chrome, Firefox, Safari, and Edge latest versions",
+          "label": "Latest versions"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F7",
+      "kit": "frontend",
+      "field": "responsive.breakpoints",
+      "title": "Responsive behavior",
+      "question": "What responsive strategy should the UI updates follow?",
+      "importance": "recommended",
+      "impact": 3,
+      "recommended": "Mobile-first using existing breakpoints detected during analysis",
+      "default": "mobile-first using existing breakpoints detected from codebase",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "mobile-first using existing breakpoints detected from codebase",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Mobile-first using existing breakpoints detected during analysis",
+          "label": "Mobile-first; retain existing breakpoints (Recommended)"
+        },
+        {
+          "value": "Desktop-only",
+          "label": "Desktop-only"
+        },
+        {
+          "value": "Match current layout exactly",
+          "label": "Match current layout exactly"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F8",
+      "kit": "frontend",
+      "field": "i18n.locales",
+      "title": "Supported locales",
+      "question": "Which locales should remain in scope for Phase 2?",
+      "importance": "optional",
+      "impact": 2,
+      "recommended": "Preserve current locales and existing i18n library, if present",
+      "default": "preserve current locales; keep existing i18n library if present",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "preserve current locales; keep existing i18n library if present",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Preserve current locales and existing i18n library, if present",
+          "label": "Preserve current locales (Recommended)"
+        },
+        {
+          "value": "English only",
+          "label": "English only"
+        },
+        {
+          "value": "No internationalization required",
+          "label": "None"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F9",
+      "kit": "frontend",
+      "field": "state_mgmt.preference",
+      "title": "Frontend state management",
+      "question": "Do you have a preference for client-side state management for the Phase 2 UI?",
+      "importance": "optional",
+      "impact": 2,
+      "recommended": "Preserve existing state patterns; otherwise prefer minimal component state plus server-state handling",
+      "default": "preserve existing pattern if identifiable; otherwise recommend minimal (component state + server-state library)",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "preserve existing pattern if identifiable; otherwise recommend minimal (component state + server-state library)",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Preserve existing state patterns; otherwise prefer minimal component state plus server-state handling",
+          "label": "Preserve existing/minimal state (Recommended)"
+        },
+        {
+          "value": "Redux Toolkit",
+          "label": "Redux Toolkit"
+        },
+        {
+          "value": "Zustand",
+          "label": "Zustand"
+        },
+        {
+          "value": "No preference",
+          "label": "No preference"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "F10",
+      "kit": "frontend",
+      "field": "routing.preference",
+      "title": "Routing preference",
+      "question": "Should Phase 2 preserve the existing routing approach, or do you have a routing preference?",
+      "importance": "optional",
+      "impact": 2,
+      "recommended": "Preserve existing routes and use the de-facto router for the existing framework",
+      "default": "use the de-facto router for the chosen target framework",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "use the de-facto router for the chosen target framework",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Preserve existing routes and use the de-facto router for the existing framework",
+          "label": "Preserve routes and existing-framework convention (Recommended)"
+        },
+        {
+          "value": "Match existing routing exactly",
+          "label": "Match existing routing exactly"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "B1",
+      "kit": "backend",
+      "field": "target.framework",
+      "title": "Backend framework and version",
+      "question": "Which backend framework and version should Phase 2 target? The profile confirms Java/Maven but not the server framework or version. Should the existing framework/version be preserved and identified during analysis, or is a specific target required?",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "Preserve the existing Java backend framework and version; identify it during analysis",
+      "default": null,
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": null,
+        "source": "skipped"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Preserve the existing Java backend framework and version; identify it during analysis",
+          "label": "Preserve existing framework/version (Recommended)"
+        },
+        {
+          "value": "Spring Boot (specify version)",
+          "label": "Spring Boot (provide version)"
+        },
+        {
+          "value": "Jakarta EE (specify version)",
+          "label": "Jakarta EE (provide version)"
+        },
+        {
+          "value": "Java Servlets/JSP (specify version)",
+          "label": "Java Servlets/JSP (provide version)"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "B2",
+      "kit": "backend",
+      "field": "api.contract_preservation",
+      "title": "API compatibility",
+      "question": "What API contract policy should apply to Phase 2?",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "must preserve",
+      "default": "must preserve",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "must preserve",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "must preserve",
+          "label": "Must preserve existing endpoints, payloads, and status codes (Recommended)"
+        },
+        {
+          "value": "can break with versioning",
+          "label": "Breaking changes allowed only with versioning"
+        },
+        {
+          "value": "can break",
+          "label": "Breaking changes allowed"
+        },
+        {
+          "value": "partial: specify endpoints/contracts to preserve",
+          "label": "Preserve selected contracts (list them)"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "B3",
+      "kit": "backend",
+      "field": "data.migration_strategy",
+      "title": "Data migration approach",
+      "question": "What database/data migration approach should be used? The brief requires additive-only migrations; please confirm that schema changes should be applied in place and additive only, or specify another additive-compatible approach.",
+      "importance": "required",
+      "impact": 5,
+      "recommended": "in-place; additive-only schema migrations",
+      "default": "TBD / assess in research phase",
+      "prefilled": true,
+      "prefilled_value": "in-place; additive-only schema migrations",
+      "answer": {
+        "value": "in-place; additive-only schema migrations",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "in-place; additive-only schema migrations",
+          "label": "In place, additive-only (Recommended)"
+        },
+        {
+          "value": "dual-write with additive-only schema changes",
+          "label": "Dual-write, additive-only schema changes"
+        },
+        {
+          "value": "new schema with additive-only rollout",
+          "label": "New schema, additive rollout"
+        },
+        {
+          "value": "no database migration",
+          "label": "No database migration"
+        },
+        {
+          "value": "TBD / assess in research phase",
+          "label": "TBD / assess in research phase"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "B4",
+      "kit": "backend",
+      "field": "auth.framework",
+      "title": "Authentication and authorization",
+      "question": "Which authentication/authorization mechanism should the implementation retain or integrate with? The brief requires caregiver approval/revocation authorization to be enforced in services.",
+      "importance": "recommended",
+      "impact": 4,
+      "recommended": "Preserve the existing authentication mechanism; identify it during analysis",
+      "default": "preserve existing auth mechanism; detect from codebase",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "preserve existing auth mechanism; detect from codebase",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Preserve the existing authentication mechanism; identify it during analysis",
+          "label": "Preserve existing mechanism (Recommended)"
+        },
+        {
+          "value": "Spring Security (specify version)",
+          "label": "Spring Security (provide version)"
+        },
+        {
+          "value": "Existing external identity provider (specify)",
+          "label": "Existing identity provider (specify)"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "B5",
+      "kit": "backend",
+      "field": "nfr.sla",
+      "title": "Service-level targets",
+      "question": "What latency, throughput, availability, or other service-level targets should the expanded application meet?",
+      "importance": "recommended",
+      "impact": 3,
+      "recommended": "Match current production baseline; no regression",
+      "default": "match current production baseline; no regression",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "match current production baseline; no regression",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "Match current production baseline; no regression",
+          "label": "Match current baseline (Recommended)"
+        },
+        {
+          "value": "No defined SLA; use reasonable local-use defaults",
+          "label": "No defined SLA"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "G1",
+      "kit": "generic",
+      "field": "success.definition",
+      "title": "Definition of done",
+      "question": "What observable outcome defines successful completion? Confirm or refine the brief's success criteria.",
+      "importance": "required",
+      "impact": 5,
+      "recommended": null,
+      "default": "feature parity with the current system; all existing user-facing behaviors preserved",
+      "prefilled": true,
+      "prefilled_value": "Deliver the stated Phase 2 capabilities in the existing MediCare AI application, with deterministic preview-and-confirm assistant actions, durable restart-safe and idempotent scheduling, reliable notifications and preferences, service-enforced caregiver authorization, reporting/audit/settings/export, secure and privacy-conscious behavior, comprehensive tests, documentation, additive-only migrations, CSRF preserved, and no arbitrary command execution or paid AI dependency.",
+      "answer": {
+        "value": "Deliver the stated Phase 2 capabilities in the existing MediCare AI application, with deterministic preview-and-confirm assistant actions, durable restart-safe and idempotent scheduling, reliable notifications and preferences, service-enforced caregiver authorization, reporting/audit/settings/export, secure and privacy-conscious behavior, comprehensive tests, documentation, additive-only migrations, CSRF preserved, and no arbitrary command execution or paid AI dependency.",
+        "source": "user"
+      },
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "G2",
+      "kit": "generic",
+      "field": "out_of_scope",
+      "title": "Out-of-scope boundaries",
+      "question": "Confirm or add any features, modules, or behaviors that must remain out of scope. The brief excludes arbitrary command execution and does not require a paid AI service.",
+      "importance": "recommended",
+      "impact": 4,
+      "recommended": null,
+      "default": "no explicit exclusions; agent will infer from project structure",
+      "prefilled": true,
+      "prefilled_value": "Arbitrary command execution is out of scope. A paid AI service is not required; do not introduce a paid AI dependency.",
+      "answer": {
+        "value": "Arbitrary command execution is out of scope. A paid AI service is not required; do not introduce a paid AI dependency.",
+        "source": "user"
+      },
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    },
+    {
+      "id": "G3",
+      "kit": "generic",
+      "field": "existing_tests.posture",
+      "title": "Existing test policy",
+      "question": "How should the existing test suite be treated during implementation?",
+      "importance": "recommended",
+      "impact": 4,
+      "recommended": "must pass",
+      "default": "must pass",
+      "prefilled": false,
+      "prefilled_value": null,
+      "answer": {
+        "value": "must pass",
+        "source": "user"
+      },
+      "depends_on": null,
+      "options": [
+        {
+          "value": "must pass",
+          "label": "Must pass; no regressions (Recommended)"
+        },
+        {
+          "value": "can rewrite",
+          "label": "May be replaced with equivalent coverage"
+        },
+        {
+          "value": "ignore",
+          "label": "Existing tests may be ignored; add comprehensive tests"
+        },
+        {
+          "value": "partial: specify suites that must pass",
+          "label": "Partial policy (specify suites)"
+        }
+      ],
+      "allow_other": true,
+      "type": "single_select"
+    },
+    {
+      "id": "G5",
+      "kit": "generic",
+      "field": "constraints.additional",
+      "title": "Additional constraints",
+      "question": "Add any additional constraints not already captured above, or accept the provided default.",
+      "importance": "optional",
+      "impact": 3,
+      "recommended": null,
+      "default": "None beyond the decisions listed in this specification.",
+      "prefilled": true,
+      "prefilled_value": "None beyond the decisions listed in this specification.",
+      "answer": {
+        "value": "None beyond the decisions listed in this specification.",
+        "source": "user"
+      },
+      "depends_on": null,
+      "type": "text",
+      "options": []
+    }
+  ]
+}

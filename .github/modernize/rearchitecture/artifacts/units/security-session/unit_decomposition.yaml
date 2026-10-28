@@ -1,0 +1,4 @@
+unit: security-session
+commit: false
+candidate_splits: []
+notes: "Current source has one filter-chain configuration and one database-backed user-details service. The Phase 2 service authorization requirements introduce new scope that is not represented as a candidate split in existing code."

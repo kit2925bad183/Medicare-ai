@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Focused tasks for upgrading medicare-ai to Java 25 LTS and resolving directly related Spring compatibility findings.",
+  "tasks": [
+    {
+      "type": "upgrade",
+      "id": "001-upgrade-java25-runtime-compatibility",
+      "description": "Upgrade the application runtime and build compatibility to Java 25 LTS, with only the directly required Spring compatibility alignment. Addresses issues: Java Version is not the latest LTS; Spring Boot Version Has Reached the End of OSS Support; Spring Framework Version Has Reached the End of OSS Support.",
+      "reason": "The project currently configures Java 21 and Spring Boot 3.3.5. The assessment identifies Java LTS and Spring support findings, and the Java upgrade guideline identifies the supported Spring line compatible with Java 25.",
+      "requirements": "Target Java 25 LTS. Keep Maven and align Spring Boot and its managed Spring Framework version to a supported Java-25-compatible line (Boot 4.x / Framework 7.x per the Java upgrade guideline), choosing a supported compatible patch level during execution. Update only application source, Maven build configuration, and dependencies that directly require changes for this compatibility move. Preserve existing behavior and unrelated worktree changes. Do not modify Docker/containerization, credentials, identity-provider configuration, database technology or migrations, or deployment/cloud-readiness concerns. Validate with a focused Maven build and the existing relevant automated tests under JDK 25; do not add tests for unrelated behavior.",
+      "dependencies": [],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    }
+  ],
+  "metadata": {
+    "planName": "java25-runtime-upgrade",
+    "projectName": "medicare-ai",
+    "language": "java",
+    "createdAt": "2026-10-27T21:40:06.311+05:30",
+    "version": "1.0"
+  }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head><title>Patient Health Records - MediCare AI</title></head>
+<body>
+<section layout:fragment="content">
+    <div class="card hero-card" style="min-height:auto;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+            <div>
+                <span class="eyebrow">Authorized Caregiver Portal</span>
+                <h3>Patient Health Overview</h3>
+                <p class="muted">Read-only delegated access granted by patient. All access is logged for patient safety and compliance.</p>
+            </div>
+            <a class="btn btn-ghost" href="/caregivers">&larr; Back to Caregivers</a>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <div class="card panel-section">
+            <h3 style="margin-top:0;">Active Medication Schedules</h3>
+            <div th:if="${schedules == null || #lists.isEmpty(schedules)}" class="empty-state">
+                <p>No active schedules recorded for this patient.</p>
+            </div>
+            <ul th:if="${schedules != null && !#lists.isEmpty(schedules)}" class="list-items">
+                <li th:each="s : ${schedules}">
+                    <div>
+                        <strong th:text="${s.medicineName}">Medicine</strong>
+                        <div class="muted" style="font-size:0.85rem;" th:text="${s.frequency + ' at ' + s.localTime}">DAILY at 09:00</div>
+                        <div class="muted" style="font-size:0.8rem;" th:text="${s.instructions != null ? s.instructions : 'No specific instructions'}">Instructions</div>
+                    </div>
+                    <span class="badge" th:text="${s.active ? 'ACTIVE' : 'INACTIVE'}" style="padding:4px 8px;border-radius:6px;background:var(--primary-soft);color:var(--primary);font-size:0.8rem;font-weight:700;">ACTIVE</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card panel-section">
+            <h3 style="margin-top:0;">Upcoming Consultations</h3>
+            <div th:if="${appointments == null || #lists.isEmpty(appointments)}" class="empty-state">
+                <p>No appointments booked for this patient.</p>
+            </div>
+            <ul th:if="${appointments != null && !#lists.isEmpty(appointments)}" class="list-items">
+                <li th:each="appt : ${appointments}">
+                    <div>
+                        <strong th:text="${appt.doctor != null ? appt.doctor.fullName : 'Doctor'}">Dr. Name</strong>
+                        <div class="muted" style="font-size:0.85rem;" th:text="${appt.doctor != null ? appt.doctor.specialty : ''}">Specialty</div>
+                        <div class="muted" style="font-size:0.8rem;" th:text="${appt.appointmentAt}">Time</div>
+                    </div>
+                    <span class="badge" th:text="${appt.status}" style="padding:4px 8px;border-radius:6px;background:rgba(20,184,166,0.12);color:var(--accent);font-size:0.8rem;font-weight:700;">BOOKED</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card panel-section" style="margin-top:20px;">
+        <h3 style="margin-top:0;">7-Day Scheduled Doses</h3>
+        <div th:if="${doses == null || #lists.isEmpty(doses)}" class="empty-state">
+            <p>No doses scheduled in the next 7 days.</p>
+        </div>
+        <ul th:if="${doses != null && !#lists.isEmpty(doses)}" class="list-items">
+            <li th:each="d : ${doses}">
+                <div>
+                    <strong th:text="${d.schedule.medicineName}">Medicine</strong>
+                    <div class="muted" style="font-size:0.85rem;" th:text="${d.dueAt}">Due Time</div>
+                </div>
+                <span class="badge" th:text="${d.state}" style="padding:4px 8px;border-radius:6px;background:var(--primary-soft);color:var(--primary);font-size:0.8rem;font-weight:700;">STATE</span>
+            </li>
+        </ul>
+    </div>
+</section>
+</body>
+</html>

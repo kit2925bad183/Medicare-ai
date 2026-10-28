@@ -1,0 +1,20 @@
+unit: application-bootstrap
+side_effects:
+  - source_loc: "src/main/resources/application.yml:21-24; src/main/resources/db/migration/V2__create_users_table.sql:1-13"
+    effect: "Before serving requests, the configured Flyway runner establishes baseline/migration history and applies V2 to create the users table if absent; JPA then validates the mapped schema."
+    must_preserve: true
+branches: []
+error_paths:
+  - source_loc: "src/main/resources/application.yml:12-24"
+    trigger: "Flyway migration or Hibernate schema validation fails during application-context startup."
+    outcome: "Application startup does not complete and the web application does not become ready."
+    contract: "Startup failure; no custom fallback or migration recovery branch is defined in application source."
+    must_preserve: true
+concurrency:
+  model: sync
+  tx_boundary: null
+notes: >
+  Startup and migration are synchronous with application-context creation.
+  Upstream artifact t1.1-backend records the repaired packaged application
+  starting and Flyway reaching version 2 on H2; this architecture task did not
+  rerun the process.

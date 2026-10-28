@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+    <title>Dashboard - MediCare AI</title>
+</head>
+<body>
+<section layout:fragment="content">
+
+    <!-- 1. HERO CARD WITH 3D BIOTECH SIMULATION -->
+    <div class="hero-card card">
+        <div style="z-index: 2;">
+            <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                <span>Deterministic Healthcare AI • Local-First</span>
+            </div>
+            <h2>Smart Care, Synchronized.</h2>
+            <p style="color:var(--text-muted); font-size:1.05rem; line-height:1.6; margin:0 0 20px;">
+                Intelligent medication scheduling, doctor appointment tracking, and multi-channel reminders powered by privacy-first rule engines.
+            </p>
+            <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                <a class="btn btn-primary" href="/medicines/new">
+                    <span>+ Schedule Dose</span>
+                </a>
+                <a class="btn btn-ghost" href="/doctors">
+                    <span>👨‍⚕️ Book Doctor</span>
+                </a>
+                <a class="btn btn-ghost" href="/assistant">
+                    <span>💬 AI Assistant</span>
+                </a>
+                <a class="btn btn-ghost" href="/reports">
+                    <span>📊 Adherence Report</span>
+                </a>
+            </div>
+        </div>
+
+        <div style="z-index: 2;">
+            <div id="threejs-container" class="three-viewport-wrap">
+                <!-- 3D HUD Top Bar -->
+                <div class="three-hud-top">
+                    <div class="three-hud-badge">
+                        <span id="three-status-text">🧬 Double Helix Genomic Sequence</span>
+                    </div>
+                    <div class="three-hud-controls">
+                        <button type="button" class="three-mode-btn active" data-mode="dna">🧬 DNA</button>
+                        <button type="button" class="three-mode-btn" data-mode="core">💓 Core</button>
+                        <button type="button" class="three-mode-btn" data-mode="molecule">🔬 Molecule</button>
+                    </div>
+                </div>
+
+                <!-- 3D WebGL Canvas -->
+                <canvas id="health-canvas"></canvas>
+
+                <!-- 3D HUD Bottom Bar -->
+                <div class="three-hud-bottom">
+                    <div style="display:flex; gap:6px;">
+                        <button type="button" id="three-pause-btn" class="three-mini-btn">⏸ Pause</button>
+                        <button type="button" id="three-speed-btn" class="three-mini-btn">⚡ 1x</button>
+                    </div>
+                    <span class="three-hint">🖱 Drag to rotate • Scroll to zoom</span>
+                </div>
+
+                <!-- Fallback if WebGL is disabled -->
+                <div id="threejs-fallback">
+                    <div style="font-size:2rem;">🧬</div>
+                    <div>MediCare 3D Bio-Simulation</div>
+                    <div style="font-size:0.75rem; color:#94a3b8;">WebGL acceleration unavailable</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. AI ASSISTANT QUICK LAUNCH BAR -->
+    <div class="card ai-quick-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <div style="background:linear-gradient(135deg, #7c3aed, #a855f7); color:#fff; width:34px; height:34px; border-radius:10px; display:grid; place-items:center; font-size:1.1rem;">
+                    ✨
+                </div>
+                <div>
+                    <strong style="color:var(--navy); font-size:1rem;">Deterministic AI Assistant Prompt Shortcuts</strong>
+                    <div style="font-size:0.8rem; color:var(--text-muted);">Zero external cloud calls • 100% private local rules</div>
+                </div>
+            </div>
+            <a href="/assistant" class="btn btn-ghost" style="padding:6px 14px; font-size:0.82rem;">Open Full Assistant →</a>
+        </div>
+        <div class="ai-chip-list">
+            <a class="ai-chip" href="/assistant?prompt=show%20today's%20medicine%20schedule">📋 Show today's medicine schedule</a>
+            <a class="ai-chip" href="/assistant?prompt=summarize%20upcoming%20appointments">📅 Summarize upcoming appointments</a>
+            <a class="ai-chip" href="/assistant?prompt=identify%20conflicting%20or%20incomplete%20schedules">⚠️ Identify conflicting schedules</a>
+            <a class="ai-chip" href="/assistant?prompt=explain%20saved%20reminder%20settings">🔔 Explain reminder settings</a>
+            <a class="ai-chip" href="/assistant?prompt=propose%20notification%20preferences">🌙 Propose quiet hours</a>
+        </div>
+    </div>
+
+    <!-- 3. HEALTH METRICS OVERVIEW (3 CARDS) -->
+    <div class="grid grid-3">
+        <div class="card metric-card">
+            <div class="metric-header">
+                <span class="label">Upcoming Reminders</span>
+                <div class="metric-icon-wrap" style="background:#eff6ff; color:var(--primary);">💊</div>
+            </div>
+            <div class="value" style="color:var(--primary);" th:text="${upcomingCount != null ? upcomingCount : 0}">0</div>
+            <div class="metric-subtext">Active doses scheduled for dispatch</div>
+        </div>
+
+        <div class="card metric-card">
+            <div class="metric-header">
+                <span class="label">Doctor Appointments</span>
+                <div class="metric-icon-wrap" style="background:#f0fdfa; color:var(--accent);">🩺</div>
+            </div>
+            <div class="value" style="color:var(--accent);" th:text="${appointmentCount != null ? appointmentCount : 0}">0</div>
+            <div class="metric-subtext">Verified specialist consultations</div>
+        </div>
+
+        <div class="card metric-card">
+            <div class="metric-header">
+                <span class="label">System Notifications</span>
+                <div class="metric-icon-wrap" style="background:#fffbeb; color:var(--warning);">🔔</div>
+            </div>
+            <div class="value" style="color:var(--warning);" th:text="${notificationCount != null ? notificationCount : 0}">0</div>
+            <div class="metric-subtext">In-app, browser, and email dispatches</div>
+        </div>
+    </div>
+
+    <!-- 4. SCHEDULE TIMELINE & APPOINTMENTS GRID -->
+    <div class="dashboard-grid">
+        <div style="display:flex; flex-direction:column; gap:24px;">
+            <!-- Upcoming Medicine Reminders -->
+            <div class="card panel-section">
+                <div class="section-heading">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:1.2rem;">⏰</span>
+                        <h3>Upcoming Medicine Doses</h3>
+                    </div>
+                    <a href="/medicines" class="btn btn-ghost" style="font-size:0.82rem; padding:6px 12px;">Manage All</a>
+                </div>
+
+                <div th:if="${upcoming == null || #lists.isEmpty(upcoming)}" class="empty-state">
+                    <div style="font-size:2rem; margin-bottom:8px;">💊</div>
+                    <p>No upcoming medication reminders for today.</p>
+                    <a href="/medicines/new" class="btn btn-primary" style="font-size:0.85rem;">+ Schedule First Medicine</a>
+                </div>
+
+                <ul th:if="${upcoming != null && !#lists.isEmpty(upcoming)}" class="list-items">
+                    <li th:each="item : ${upcoming}">
+                        <div>
+                            <strong style="font-size:1rem; color:var(--navy);" th:text="${item.medicineName}">Medicine</strong>
+                            <div class="muted due-time" style="font-size:0.82rem; margin-top:2px;" th:text="${item.dueAt}" th:data-time-zone="${item.timeZone}">Due Time</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span th:id="'dose-badge-' + ${item.id}"
+                                  class="badge badge-primary"
+                                  th:text="${item.state}">AVAILABLE</span>
+
+                            <div th:id="'dose-actions-' + ${item.id}"
+                                 th:if="${item.state == 'AVAILABLE'}"
+                                 style="display:flex; gap:6px;">
+                                <button type="button"
+                                        class="btn btn-ghost"
+                                        style="padding:5px 12px; font-size:0.8rem; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0;"
+                                        th:data-occurrence-id="${item.id}"
+                                        data-dose-action="TAKEN">✓ Taken</button>
+                                <button type="button"
+                                        class="btn btn-ghost"
+                                        style="padding:5px 12px; font-size:0.8rem; background:#f8fafc; color:#64748b; border:1px solid #e2e8f0;"
+                                        th:data-occurrence-id="${item.id}"
+                                        data-dose-action="SKIPPED">Skip</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Scheduled Appointments -->
+            <div class="card panel-section">
+                <div class="section-heading">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:1.2rem;">👨‍⚕️</span>
+                        <h3>Doctor Appointments</h3>
+                    </div>
+                    <a href="/appointments" class="btn btn-ghost" style="font-size:0.82rem; padding:6px 12px;">Directory</a>
+                </div>
+
+                <div th:if="${appointments == null || #lists.isEmpty(appointments)}" class="empty-state">
+                    <div style="font-size:2rem; margin-bottom:8px;">🩺</div>
+                    <p>No verified doctor consultations scheduled.</p>
+                    <a href="/doctors" class="btn btn-ghost" style="font-size:0.85rem;">Browse Doctor Directory</a>
+                </div>
+
+                <ul th:if="${appointments != null && !#lists.isEmpty(appointments)}" class="list-items">
+                    <li th:each="appt : ${appointments}">
+                        <div>
+                            <strong style="color:var(--navy);" th:text="${appt.doctor != null ? appt.doctor.fullName : 'Doctor'}">Dr. Name</strong>
+                            <div style="font-size:0.85rem; color:var(--accent); font-weight:600;" th:text="${appt.doctor != null ? appt.doctor.specialty : ''}">Specialty</div>
+                            <div class="muted due-time" style="font-size:0.82rem; margin-top:2px;" th:text="${appt.appointmentAt}" th:data-time-zone="${appt.timeZone}">Time</div>
+                        </div>
+                        <div>
+                            <span class="badge badge-success" th:text="${appt.status}">BOOKED</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Right Side: Recent Notifications & System Status -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+            <div class="card panel-section">
+                <div class="section-heading">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:1.2rem;">🔔</span>
+                        <h3>Recent Alerts</h3>
+                    </div>
+                    <a href="/settings/notifications" class="btn btn-ghost" style="font-size:0.82rem; padding:6px 12px;">Preferences</a>
+                </div>
+
+                <div th:if="${notifications == null || #lists.isEmpty(notifications)}" class="empty-state">
+                    <p>All reminder dispatches are clear.</p>
+                </div>
+
+                <ul th:if="${notifications != null && !#lists.isEmpty(notifications)}" class="list-items">
+                    <li th:each="n : ${notifications}">
+                        <div>
+                            <strong style="font-size:0.9rem; color:var(--navy);" th:text="${n.medicineName}">Reminder</strong>
+                            <div class="muted due-time" style="font-size:0.8rem;" th:text="${n.dueAt}" th:data-time-zone="${n.timeZone}">Time</div>
+                        </div>
+                        <form method="post" th:action="@{/notifications/{id}/dismiss(id=${n.id})}">
+                            <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : ''}" th:value="${_csrf != null ? _csrf.token : ''}" />
+                            <button class="btn btn-ghost" style="font-size:0.75rem; padding:4px 10px;">Dismiss</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Caregiver & Safety Verification Card -->
+            <div class="card panel-section" style="background:linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border:1px solid rgba(16, 185, 129, 0.2);">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                    <div style="background:#10b981; color:#fff; width:32px; height:32px; border-radius:8px; display:grid; place-items:center; font-weight:700;">
+                        🛡️
+                    </div>
+                    <div>
+                        <strong style="color:var(--navy); font-size:0.95rem;">Caregiver Delegation</strong>
+                        <div style="font-size:0.75rem; color:#059669; font-weight:600;">Explicit Patient Consent Enforced</div>
+                    </div>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5; margin:0 0 14px;">
+                    Invite trusted family members or caregivers to monitor scheduled doses with read-only authorization.
+                </p>
+                <a href="/caregivers" class="btn btn-ghost btn-block" style="font-size:0.82rem; background:#ffffff; border:1px solid #a7f3d0; color:#065f46;">
+                    Manage Authorized Caregivers →
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

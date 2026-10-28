@@ -1,0 +1,84 @@
+services:
+  # -------------------------------------------------------------
+  # 1. MediCare AI Application Container
+  # -------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medicare-ai:latest
+    container_name: medicare_app
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-8080}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-medicare_ai}?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+      DB_USERNAME: ${MYSQL_USER:-medicare_app}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-medicare_secure_pass}
+      DB_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_MAIL_HOST: ${MAIL_HOST:-mailpit}
+      SPRING_MAIL_PORT: ${MAIL_PORT:-1025}
+      SESSION_COOKIE_SECURE: "${SESSION_COOKIE_SECURE:-false}"
+      REMEMBER_ME_KEY: ${REMEMBER_ME_KEY:-production-long-secure-random-secret-key}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - medicare_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # -------------------------------------------------------------
+  # 2. MySQL 8 Database Container
+  # -------------------------------------------------------------
+  db:
+    image: mysql:8.0
+    container_name: medicare_mysql
+    restart: unless-stopped
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secure_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-medicare_ai}
+      MYSQL_USER: ${MYSQL_USER:-medicare_app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-medicare_secure_pass}
+    volumes:
+      - medicare_mysql_data:/var/lib/mysql
+    networks:
+      - medicare_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root_secure_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # -------------------------------------------------------------
+  # 3. Development / Staging Email Catcher (Mailpit)
+  # -------------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: medicare_mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP port
+      - "8025:8025"  # Web UI port
+    networks:
+      - medicare_network
+
+networks:
+  medicare_network:
+    driver: bridge
+
+volumes:
+  medicare_mysql_data:
+    driver: local

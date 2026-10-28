@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head>
+    <title>Add Medicine Reminder - MediCare AI</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="card hero-card" style="min-height:auto;margin-bottom:20px;">
+        <div>
+            <span class="eyebrow">Prescription Care</span>
+            <h3>Add Medicine Reminder</h3>
+            <p class="muted">Enter a medicine name and schedule exactly as prescribed. This application does not alter prescribed regimens.</p>
+        </div>
+    </div>
+
+    <div class="card form-card">
+        <div class="alert alert-error" role="alert" th:if="${scheduleError}" th:text="${scheduleError}"></div>
+        <form th:action="@{/medicines}" th:object="${scheduleRequest}" method="post" class="stacked-form">
+            <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : ''}" th:value="${_csrf != null ? _csrf.token : ''}" />
+
+            <div class="form-group">
+                <label for="medicineName">Medicine Name</label>
+                <input id="medicineName" th:field="*{medicineName}" maxlength="120" required placeholder="e.g. Metformin, Lisinopril"/>
+                <span class="field-error" th:if="${#fields.hasErrors('medicineName')}" th:errors="*{medicineName}"></span>
+            </div>
+            <div class="form-group">
+                <label for="instructions">Prescribed Instructions (Optional)</label>
+                <input id="instructions" th:field="*{instructions}" maxlength="500" placeholder="e.g. Take 1 tablet with meal"/>
+                <span class="field-error" th:if="${#fields.hasErrors('instructions')}" th:errors="*{instructions}"></span>
+            </div>
+            <div class="form-row two-up">
+                <div class="form-group">
+                    <label for="frequency">Frequency</label>
+                    <select id="frequency" th:field="*{frequency}">
+                        <option value="DAILY">Daily</option>
+                        <option value="WEEKLY">Weekly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="localTime">Local Reminder Time</label>
+                    <input id="localTime" type="time" th:field="*{localTime}" required/>
+                    <span class="field-error" th:if="${#fields.hasErrors('localTime')}" th:errors="*{localTime}"></span>
+                </div>
+            </div>
+            <div class="form-row two-up">
+                <div class="form-group">
+                    <label for="weekday">Weekday (for weekly schedules)</label>
+                    <select id="weekday" th:field="*{weekday}">
+                        <option value="">Not applicable</option>
+                        <option th:each="day : ${weekdays}" th:value="${day.value}" th:text="${day}">MONDAY</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input id="startDate" type="date" th:field="*{startDate}" required/>
+                    <span class="field-error" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></span>
+                </div>
+            </div>
+            <p class="muted" style="font-size:0.85rem;margin:12px 0 20px;">Times use your account time zone. Daylight-saving changes are automatically resolved by IANA time-zone rules.</p>
+            <div style="display:flex;gap:12px;">
+                <button class="btn btn-primary" type="submit">Save Reminder</button>
+                <a class="btn btn-ghost" th:href="@{/medicines}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

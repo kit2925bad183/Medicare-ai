@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MediCare AI | Login</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body class="auth-page">
+<div class="auth-shell">
+    <div class="auth-panel card">
+        <div class="brand-block">
+            <div class="brand-mark">+</div>
+            <div>
+                <p class="eyebrow">MediCare AI</p>
+                <h1>Care, organized.</h1>
+            </div>
+        </div>
+
+        <div th:if="${errorMessage != null}" class="alert alert-error" th:text="${errorMessage}"></div>
+        <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
+
+        <div class="demo-credentials" style="margin-bottom:18px; padding:12px 14px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; font-size:0.875rem;">
+            <div style="font-weight:700; color:var(--primary); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                <span>✨</span> Quick Demo Login
+            </div>
+            <div style="color:var(--text);"><span style="color:var(--muted);">Email:</span> <strong>demo@medicare.local</strong></div>
+            <div style="color:var(--text);"><span style="color:var(--muted);">Password:</span> <strong>Password123!</strong></div>
+            <button type="button" id="fill-demo" class="btn btn-ghost btn-block" style="margin-top:10px; font-size:0.8rem; padding:6px 10px;">Autofill Demo Credentials</button>
+        </div>
+
+        <form th:action="@{/login}" method="post" class="stacked-form">
+            <div class="form-group">
+                <label for="username">Email</label>
+                <input id="username" name="username" type="email" required />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" required />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Log in</button>
+        </form>
+
+        <div class="auth-footer">
+            <span>Need an account?</span>
+            <a th:href="@{/register}">Create one</a>
+        </div>
+
+        <script>
+            document.getElementById('fill-demo')?.addEventListener('click', function() {
+                document.getElementById('username').value = 'demo@medicare.local';
+                document.getElementById('password').value = 'Password123!';
+            });
+        </script>
+    </div>
+</div>
+</body>
+</html>

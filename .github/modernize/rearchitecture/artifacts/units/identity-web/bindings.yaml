@@ -1,0 +1,27 @@
+unit: identity-web
+bindings:
+  - type: route-declaration
+    name: "GET /, GET /login, GET /register, POST /register"
+    source_loc: "src/main/java/com/medicare/identity/IdentityController.java:25-57"
+    target: "IdentityController"
+    must_appear_in_target: true
+    notes: "Spring MVC controller returns redirects or Thymeleaf view names; POST /register is protected by the active default CSRF filter."
+  - type: annotation
+    name: "@Valid @ModelAttribute('registrationRequest')"
+    source_loc: "src/main/java/com/medicare/identity/IdentityController.java:44-46"
+    target: "RegistrationRequest"
+    must_appear_in_target: true
+    notes: "Jakarta Bean Validation applies to submitted registration fields."
+  - type: annotation
+    name: "@Transactional"
+    source_loc: "src/main/java/com/medicare/identity/IdentityService.java:18"
+    target: "IdentityService.register"
+    must_appear_in_target: true
+    notes: "Registration read/write is within a service transaction."
+  - type: convention
+    name: "Thymeleaf auth views"
+    source_loc: "src/main/resources/templates/auth/login.html:1; src/main/resources/templates/auth/register.html:1"
+    target: "auth/login and auth/register"
+    must_appear_in_target: true
+    notes: "Thymeleaf forms use th:action; Spring Security/Thymeleaf renders hidden CSRF inputs for POST forms, verified in upstream tests and live page checks."
+runtime_config: []

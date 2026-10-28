@@ -1,0 +1,9 @@
+flows: []
+notes: >
+  Spring Security configures a session-backed authenticated principal and
+  CurrentUserService can resolve that principal to User through SecurityContextHolder,
+  but no present controller or external route invokes CurrentUserService. Static source
+  therefore does not establish a paired cross-unit writer/reader flow in the current
+  entry-point graph. Re-evaluate when protected Phase 2 routes/services are added;
+  enforce ownership/consent checks in services rather than inferring authorization
+  from UI visibility.

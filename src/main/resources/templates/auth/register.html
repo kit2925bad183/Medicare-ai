@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MediCare AI | Register</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body class="auth-page">
+<div class="auth-shell">
+    <div class="auth-panel card">
+        <div class="brand-block">
+            <div class="brand-mark">+</div>
+            <div>
+                <p class="eyebrow">MediCare AI</p>
+                <h1>Start your care plan</h1>
+            </div>
+        </div>
+
+        <div th:if="${registrationError != null}" class="alert alert-error" role="alert" th:text="${registrationError}"></div>
+
+        <form th:action="@{/register}" th:object="${registrationRequest}" method="post" class="stacked-form">
+            <div class="form-row two-up">
+                <div class="form-group">
+                    <label for="firstName">First name</label>
+                    <input id="firstName" type="text" th:field="*{firstName}" maxlength="100" required />
+                    <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last name</label>
+                    <input id="lastName" type="text" th:field="*{lastName}" maxlength="100" required />
+                    <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" type="email" th:field="*{email}" maxlength="254" required />
+                <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" th:field="*{password}" minlength="8" maxlength="128" required />
+                <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+            </div>
+            <div class="form-group">
+                <label for="timeZone">Time zone</label>
+                <select id="timeZone" th:field="*{timeZone}">
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">America/New_York</option>
+                    <option value="Europe/London">Europe/London</option>
+                    <option value="Asia/Kolkata">Asia/Kolkata</option>
+                    <option value="Australia/Sydney">Australia/Sydney</option>
+                </select>
+                <span class="field-error" th:if="${#fields.hasErrors('timeZone')}" th:errors="*{timeZone}"></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Create account</button>
+        </form>
+
+        <div class="auth-footer">
+            <span>Already registered?</span>
+            <a th:href="@{/login}">Log in</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
